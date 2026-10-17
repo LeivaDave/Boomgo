@@ -1,0 +1,8 @@
+{
+  "name": "boomgo-server",
+  "version": "1.0.0",
+  "description": "Servidor en línea de Boomgo",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
