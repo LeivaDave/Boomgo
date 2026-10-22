@@ -71,12 +71,12 @@ const rooms = new Map();
 function newCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; for (;;) { let c = ''; for (let i = 0; i < 4; i++) c += A[Math.floor(Math.random() * A.length)]; if (!rooms.has(c)) return c; } }
 
 class Room {
-  constructor(pub) { this.code = newCode(); this.pub = pub; this.players = [null, null, null, null]; this.host = null; this.state = 'lobby'; this.ctx = null; this.startAt = pub ? Date.now() + 10000 : 0; this.tickN = 0; rooms.set(this.code, this); }
+  constructor(pub) { this.code = newCode(); this.pub = pub; this.players = [null, null, null, null]; this.host = null; this.state = 'lobby'; this.ctx = null; this.startAt = pub ? Date.now() + 30000 : 0; this.tickN = 0; rooms.set(this.code, this); }
   humans() { return this.players.filter(Boolean); }
   add(conn) {
     const slot = this.players.findIndex(p => !p); if (slot < 0) return false;
     this.players[slot] = conn; conn.room = this; conn.slot = slot; if (!this.host) this.host = conn;
-    if (this.pub && this.humans().length >= 2) this.startAt = Math.min(this.startAt, Date.now() + 6000);
+    if (this.pub && this.humans().length >= 2) this.startAt = Math.min(this.startAt, Date.now() + 10000);
     this.info(); return true;
   }
   remove(conn) {
