@@ -71,9 +71,10 @@ const rooms = new Map();
 function newCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; for (;;) { let c = ''; for (let i = 0; i < 4; i++) c += A[Math.floor(Math.random() * A.length)]; if (!rooms.has(c)) return c; } }
 
 class Room {
-  constructor(pub) { this.code = newCode(); this.pub = pub; this.players = [null, null, null, null]; this.host = null; this.state = 'lobby'; this.ctx = null; this.startAt = pub ? Date.now() + 30000 : 0; this.tickN = 0; rooms.set(this.code, this); }
+  constructor(pub, mode) { this.code = newCode(); this.pub = pub; this.mode = mode || 'pvp'; this.players = [null, null, null, null]; this.host = null; this.state = 'lobby'; this.ctx = null; this.startAt = pub ? Date.now() + 30000 : 0; this.tickN = 0; rooms.set(this.code, this); }
   humans() { return this.players.filter(Boolean); }
   add(conn) {
+    if (this.mode === 'story' && this.humans().length >= 2) return false;
     const slot = this.players.findIndex(p => !p); if (slot < 0) return false;
     this.players[slot] = conn; conn.room = this; conn.slot = slot; if (!this.host) this.host = conn;
     if (this.pub && this.humans().length >= 2) this.startAt = Math.min(this.startAt, Date.now() + 10000);
@@ -90,18 +91,30 @@ class Room {
   info() {
     const p = []; this.players.forEach((c, s) => { if (c) p.push({ s }); });
     const cd = this.pub && this.state === 'lobby' ? Math.max(0, Math.ceil((this.startAt - Date.now()) / 1000)) : 0;
-    this.players.forEach((c, s) => { if (c) c.send({ t: 'room', code: this.code, pub: this.pub ? 1 : 0, p, me: s, host: this.host ? this.host.slot : -1, cd }); });
+    this.players.forEach((c, s) => { if (c) c.send({ t: 'room', code: this.code, pub: this.pub ? 1 : 0, story: this.mode === 'story' ? 1 : 0, p, me: s, host: this.host ? this.host.slot : -1, cd }); });
   }
   begin() {
     if (this.state !== 'lobby') return;
     const hs = this.humans(); if (!hs.length) return;
     this.players = [null, null, null, null]; hs.forEach((c, i) => { this.players[i] = c; c.slot = i; });
-    this.ctx = makeCtx(); const arena = pick(ARENAS);
+    this.ctx = makeCtx();
+    if (this.mode === 'story') {
+      this.ctx.NET.startStory(hs.length); this.state = 'play'; this.tickN = 0;
+      this.players.forEach((c, i) => { if (c) c.send({ t: 'start', slot: i, arena: 'classic', n: hs.length, story: '1-1' }); });
+      return;
+    }
+    const arena = pick(ARENAS);
     this.ctx.NET.start(arena, hs.length); this.state = 'play'; this.tickN = 0;
     this.players.forEach((c, i) => { if (c) c.send({ t: 'start', slot: i, arena, n: hs.length }); });
   }
+  endStory() {
+    this.state = 'lobby'; this.ctx = null;
+    this.players.forEach(c => { if (c) c.send({ t: 'storyend' }); });
+    this.info();
+  }
   tick() {
     try { this.ctx.NET.tick(TICK); } catch (e) { console.error('tick error', e.message); return; }
+    if (this.mode === 'story' && this.ctx.NET.sfin()) { this.endStory(); return; }
     if (++this.tickN % 3 === 0) {
       let snap; try { snap = JSON.stringify(this.ctx.NET.snap()); } catch (e) { console.error('snap error', e.message); return; }
       this.players.forEach(c => { if (c) c.send(snap); });
@@ -125,6 +138,11 @@ function handle(conn, raw) {
       if (rooms.size >= MAX_ROOMS) { conn.send({ t: 'err', m: 'Servidor lleno, intenta en un momento' }); return; }
       new Room(false).add(conn); break;
     }
+    case 'screate': {
+      if (r) return;
+      if (rooms.size >= MAX_ROOMS) { conn.send({ t: 'err', m: 'Servidor lleno, intenta en un momento' }); return; }
+      new Room(false, 'story').add(conn); break;
+    }
     case 'join': {
       if (r) return;
       const room = rooms.get(String(m.code || '').toUpperCase());
@@ -136,7 +154,7 @@ function handle(conn, raw) {
     case 'start': if (r && r.state === 'lobby' && r.host === conn) r.begin(); break;
     case 'in': if (r && r.state === 'play' && conn.slot >= 0) { try { r.ctx.NET.inp(conn.slot, m.x, m.y); } catch (e) {} } break;
     case 'act': if (r && r.state === 'play' && conn.slot >= 0 && ['b', 'z', 'd', 'pR', 'pI', 'aR', 'aI'].includes(m.a)) { try { r.ctx.NET.act(conn.slot, m.a); } catch (e) {} } break;
-    case 'rematch': if (r && r.state === 'play') { try { r.ctx.NET.rematch(pick(ARENAS)); } catch (e) {} } break;
+    case 'rematch': if (r && r.state === 'play' && r.mode !== 'story') { try { r.ctx.NET.rematch(pick(ARENAS)); } catch (e) {} } break;
     case 'leave': if (r) r.remove(conn); break;
   }
 }
