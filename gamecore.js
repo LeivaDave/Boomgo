@@ -544,8 +544,8 @@ resize();addEventListener('resize',resize);addEventListener('orientationchange',
 
 
 /* ===== MODO HISTORIA: núcleo (se usa en el juego y en el servidor) ===== */
-const LV={'1-1':{arena:'classic',drop:1,map:["#################", "#P..oooooo.ooo.d#", "#.#.#.#.#o#o#o#.#", "#oooooo.o.o.oo..#", "#.#.#o#o#o#o#.#o#", "#.o..oo.o.ooo.oo#", "#o#.#.#o#o#o#o#.#", "#oooo.o.odoo..o.#", "#o#o#.#.#o#.#o#o#", "#.ooooooooo.oo.o#", "#o#.#.#o#o#.#.#o#", "#..oooo.o.o.oooo#", "#o#o#o#.#o#o#.#K#", "#d.ooooooo....oo#", "#################"]},'1-2':{arena:'classic',drop:.5,map:["#################################", "#P.ooo..ooooooo.ooo...ooooo.oo.o#", "#.#o#o#o#o#o#o#.#o#.#o#.#.#.#.#o#", "#.oo.o..oooo.ooo..od..ooooooo.oo#", "#o#o#o#.#.#o#.#.#.#.#o#.#.#o#.#o#", "#oo.oo..o.ooooooo...oo.o.oo...oo#", "#o#.#o#o#o#.#o#.#.#o#.#.#.#o#o#o#", "#..oooooodooooooooo..T....ooo.o.#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#o#.#.#", "#o.ooo..oo.ooo..ooo.oooooooo...o#", "#o#o#o#o#.#o#o#o#.#.#.#o#.#.#.#.#", "#.o.oo...oooooooo..oo..oo..d.ooo#", "#o#.#o#o#o#o#.#o#o#o#o#o#o#o#o#K#", "#o...oooo.oooooo.oo..oooooo....o#", "#################################"]},'1-3':{arena:'classic',drop:.2,map:["#################################", "#P..o...o.oo.oo.oooooo.o..o.oo.o#", "#.#.#.#o#o#o#o#o#o#o#o#o#o#o#.#K#", "#oooooodoo.oooo.oooo.o.oooo..ooo#", "#o#o#o#o#o#o#o#o#.#.#o#o#.#.#o#o#", "#o.ooo...o....oo.o.ooooo.T.o..o.#", "#.#o#.#o#.#.#.#o#o#.#.#o#.#o#.#.#", "#....oo.oooo.T.ooooooo.ooooooooo#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#.#.#.#", "#o.oo.o.o.oooo.o.o..oo...ood.ooo#", "#o#o#o#o#o#.#o#.#o#.#.#o#o#.#.#.#", "#ooo..ooooooo..d..o....oo.oo..oo#", "#o#o#o#o#.#.#o#.#o#.#o#o#o#.#.#o#", "#.ooo.oooooooo..o.oooo..oo.ooooo#", "#################################"]}};
-let dogs=[],trs=[];
+const LV={'1-1':{arena:'classic',drop:1,map:["#################", "#P..oooooo.ooo.d#", "#.#.#.#.#o#o#o#.#", "#oooooo.o.o.oo..#", "#.#.#o#o#o#o#.#o#", "#.o..oo.o.ooo.oo#", "#o#.#.#o#o#o#o#.#", "#oooo.o.odoo..o.#", "#o#o#.#.#o#.#o#o#", "#.ooooooooo.oo.o#", "#o#.#.#o#o#.#.#o#", "#..oooo.o.o.oooo#", "#o#o#o#.#o#o#.#K#", "#d.ooooooo....oo#", "#################"]},'1-2':{arena:'classic',drop:.5,map:["#################################", "#P.ooo..ooooooo.ooo...ooooo.oo.o#", "#.#o#o#o#o#o#o#.#o#.#o#.#.#.#.#o#", "#.oo.o..oooo.ooo..od..ooooooo.oo#", "#o#o#o#.#.#o#.#.#.#.#o#.#.#o#.#o#", "#oo.oo..o.ooooooo...oo.o.oo...oo#", "#o#.#o#o#o#.#o#.#.#o#.#.#.#o#o#o#", "#..oooooodooooooooo..T....ooo.o.#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#o#.#.#", "#o.ooo..oo.ooo..ooo.oooooooo...o#", "#o#o#o#o#.#o#o#o#.#.#.#o#.#.#.#.#", "#.o.oo...oooooooo..oo..oo..d.ooo#", "#o#.#o#o#o#o#.#o#o#o#o#o#o#o#o#K#", "#o...oooo.oooooo.oo..oooooo....o#", "#################################"]},'1-3':{arena:'classic',drop:.2,map:["#################################", "#P..o...o.oo.oo.oooooo.o..o.oo.o#", "#.#.#.#o#o#o#o#o#o#o#o#o#o#o#.#K#", "#oooooodoo.oooo.oooo.o.oooo..ooo#", "#o#o#o#o#o#o#o#o#.#.#o#o#.#.#o#o#", "#o.ooo...o....oo.o.ooooo.T.o..o.#", "#.#o#.#o#.#.#.#o#o#.#.#o#.#o#.#.#", "#....oo.oooo.T.ooooooo.ooooooooo#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#.#.#.#", "#o.oo.o.o.oooo.o.o..oo...ood.ooo#", "#o#o#o#o#o#.#o#.#o#.#.#o#o#.#.#.#", "#ooo..ooooooo..d..o....oo.oo..oo#", "#o#o#o#o#.#.#o#.#o#.#o#o#o#.#.#o#", "#.ooo.oooooooo..o.oooo..oo.ooooo#", "#################################"]},'2-1':{arena:'rock',drop:.5,map:["#################", "#P.o.o.oo.o....R#", "#.#.#o#o#o#o#.#o#", "#..o..o.o...oooo#", "#o#.#.#o#o#.#o#.#", "#ooooo.o.o.ooooo#", "#.#.#.#o#o#o#.#o#", "#.oo..oooRoo.oo.#", "#o#.#o#.#o#.#.#.#", "#oooo.oooooo.o.o#", "#.#o#o#.#.#.#o#o#", "#.oooo..oooo...o#", "#o#.#o#.#.#o#o#K#", "#R.oooooooo..o.o#", "#################"]}};
+let dogs=[],trs=[],rks=[];
 const STP=[[1,1],[2,1],[1,2],[3,1]];
 function blankInv(){return{cap:1,mx:1,spd:75,sp:{R:0,Z:0,I:0}}}
 function say(t){msgT=2;msgTxt=t;msgUp=1}
@@ -588,7 +588,7 @@ function walkStep(o,dt,tx,ty,pre){
   if(!dogFree(o.nx,o.ny)){o.mvg=false;return}
   const gx=o.nx*T+T/2,gy=o.ny*T+T/2,ddx=gx-o.x,ddy=gy-o.y,dist=Math.hypot(ddx,ddy),s=o.spd*dt;
   if(dist<=s){o.x=gx;o.y=gy;o.mvg=false}else{o.x+=ddx/dist*s;o.y+=ddy/dist*s}
-  o.fr+=dt*(o.bite!==undefined?12:8)}}
+  o.fr+=dt*(o.bite!==undefined?12:(o.dash>0?18:8))}}
 function dogStep(d,dt){
  if(d.dead){d.dt+=dt;return}
  const tx=Math.floor(d.x/T),ty=Math.floor(d.y/T);
@@ -613,24 +613,45 @@ function trStep(r,dt){
  if(r.wh<=0){r.wh=30;r.act=1;r.at=.9;dogs.forEach(d=>{if(!d.dead){d.call=4;d.hunt=0;d.cr=r}});say('🐕 ¡El entrenador silba! Los perros acuden');return}
  if(r.wp<=0){r.wp=45;r.act=2;r.at=.9;dogs.forEach(d=>{if(!d.dead){d.hunt=5;d.call=0;d.cr=null}});say('⚠️ ¡Látigo! Los perros te atacan');return}
  walkStep(r,dt,tx,ty,null)}
+function mkRk(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:75,fz:0,fr:0,dead:false,dt:0,mvg:false,dash:0,armed:true}}
+/* carrera del rockero: sigue recto rompiendo cajas; si choca con pared o bomba, gira */
+function dashDir(r,tx,ty){
+ const can=p=>{const x=tx+p[0],y=ty+p[1];return x>0&&y>0&&x<W-1&&y<H-1&&grid[y][x]!=1&&grid[y][x]!=3&&!bombAt(x,y)};
+ let d=[r.dx,r.dy];
+ if(!can(d)){const alts=DIRS.filter(p=>can(p)&&!(p[0]==-r.dx&&p[1]==-r.dy)),pool=alts.length?alts:DIRS.filter(can);if(!pool.length)return null;d=pool[Math.floor(Math.random()*pool.length)]}
+ const x=tx+d[0],y=ty+d[1];
+ if(grid[y][x]==2){grid[y][x]=0;dropAt(x,y);bursts.push({x:x*T+T/2,y:y*T+T/2,l:.3});sfx('pick')}
+ return d}
+function rkStep(r,dt){
+ if(r.dead){r.dt+=dt;return}
+ const tx=Math.floor(r.x/T),ty=Math.floor(r.y/T);
+ if(fire[ty][tx]>0){r.dead=true;r.dt=0;sfx('boom');return}
+ if(ice[ty][tx]>0)r.fz=5;
+ if(r.fz>0){r.fz-=dt;return}
+ killNear(r);
+ const dark=(mt+10)%28>=24;
+ if(dark&&r.armed){r.armed=false;r.dash=2}
+ if(!dark)r.armed=true;
+ if(r.dash>0){r.dash-=dt;r.spd=270}else r.spd=75;
+ walkStep(r,dt,tx,ty,r.dash>0?()=>dashDir(r,tx,ty):null)}
 function buildStory(lv,n,invs){const L=LV[lv];
  story.on=true;story.lv=lv;story.t=0;story.end=0;story.fin=0;story.n=n;story.drop=L.drop||1;
  story.enter=JSON.parse(JSON.stringify(invs));story.inv=JSON.parse(JSON.stringify(invs));
  W=L.map[0].length;camX=0;
  HUMANS=[0,1,2,3].map(i=>i<n);arena=L.arena;init();
- dogs=[];trs=[];special={};items=[];bombs=[];
+ dogs=[];trs=[];rks=[];special={};items=[];bombs=[];
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const ch=L.map[y][x];grid[y][x]=ch=='#'?1:(ch=='o'||ch=='K')?2:0;
   if(ch=='K')special[K(x,y)]='K';
   if(ch=='d')dogs.push(mkDog(x,y));
-  if(ch=='T')trs.push(mkTr(x,y))}
+  if(ch=='T')trs.push(mkTr(x,y));if(ch=='R')rks.push(mkRk(x,y))}
  ents.forEach((e,i)=>{if(i<n){const iv=invs[i]||blankInv();e.cap=iv.cap;e.mx=iv.mx;e.spd=iv.spd;e.sp.R=iv.sp.R;e.sp.Z=iv.sp.Z;e.sp.I=iv.sp.I;e.x=STP[i][0]*T+T/2;e.y=STP[i][1]*T+T/2}else{e.alive=false;e.hid=true}})}
 function storyKey(e){if(story.end)return;story.end=2;story.wt=story.net?5:.9;
  ents.forEach((q,i)=>{if(!q.hid)story.inv[i]={cap:q.cap,mx:q.mx,spd:q.spd,sp:{R:q.sp.R||0,Z:q.sp.Z||0,I:q.sp.I||0}}});
  story.done[story.lv]=true;if(!story.net)stSave();msgT=2;msgTxt='🔑 ¡LLAVE!';msgUp=1}
 function storyTick(dt){
- story.t+=dt;mt=0;
- if(!story.end){dogs.forEach(d=>dogStep(d,dt));trs.forEach(r=>trStep(r,dt))}
- dogs=dogs.filter(d=>!(d.dead&&d.dt>1.4));trs=trs.filter(r=>!(r.dead&&r.dt>1.4));
+ story.t+=dt;mt=story.t%28;
+ if(!story.end){dogs.forEach(d=>dogStep(d,dt));trs.forEach(r=>trStep(r,dt));rks.forEach(r=>rkStep(r,dt))}
+ dogs=dogs.filter(d=>!(d.dead&&d.dt>1.4));trs=trs.filter(r=>!(r.dead&&r.dt>1.4));rks=rks.filter(r=>!(r.dead&&r.dt>1.4));
  if(!story.end&&ents.filter(e=>!e.hid).every(e=>!e.alive)){story.end=1;story.wt=story.net?4:1}
  if(!story.end)return;
  story.wt-=dt;
@@ -667,7 +688,7 @@ globalThis.NET={_lg:'',_n:0,
   if(arena=='bh')r.bh={c:+bhC.toFixed(2),a:bhA?1:0,p:bhPh};
   if(arena=='rock')r.dc=deco;if(arena=='cryo')r.wh=wallHp;
   r.mg={t:msgT>0?+msgT.toFixed(1):0,x:msgTxt,u:msgUp?1:0};
-  if(story.on){r.dg=dogs.map(d=>[Math.round(d.x*10)/10,Math.round(d.y*10)/10,d.face,Math.floor(d.fr)%10,d.fz>0?1:0,d.dead?1:0,+d.dt.toFixed(2),d.mvg?1:0,d.hunt>0?2:(d.call>0?1:0)]);r.tr=trs.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%5,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.act]);r.sty={lv:story.lv,e:story.end}}
+  if(story.on){r.dg=dogs.map(d=>[Math.round(d.x*10)/10,Math.round(d.y*10)/10,d.face,Math.floor(d.fr)%10,d.fz>0?1:0,d.dead?1:0,+d.dt.toFixed(2),d.mvg?1:0,d.hunt>0?2:(d.call>0?1:0)]);r.tr=trs.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%5,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.act]);r.rk=rks.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%60,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.dash>0?1:0]);r.sty={lv:story.lv,e:story.end}}
   return r}};
 
 // ===== cliente del modo en línea =====
