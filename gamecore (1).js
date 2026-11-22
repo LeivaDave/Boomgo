@@ -124,7 +124,7 @@ function place(e,tp,k){if(menuOpen)return;
  const nk=((k||'').includes('R')?'R':'')+((k||'').includes('I')?'I':'');if(bombs.filter(b=>b.owner==e&&(hk(b,'R')||hk(b,'I'))==(nk!=='')).length>=(nk!==''?3:e.cap)||bombs.some(o=>o.x==tx&&o.y==ty&&((hk(o,'R')?'R':'')+(hk(o,'I')?'I':''))==nk))return;
  const t=tp||e.mx;
  const b={x:tx,y:ty,r:(k||'').includes('I')?5:RG[t],t:(k||'').includes('R')?9999:3,owner:e,type:t,k,at:mt};bombs.push(b);e.through.add(b);stunNear(b);return b}
-function dropAt(x,y){const sk=special[K(x,y)];if(sk){delete special[K(x,y)];items.push({x,y,k:sk,age:0});return}
+function dropAt(x,y){if(ndrop[K(x,y)]){delete ndrop[K(x,y)];return}const sk=special[K(x,y)];if(sk){delete special[K(x,y)];items.push({x,y,k:sk,age:0});return}
  if(Math.random()<(arena=='cryo'?.75:.4)*(story.on?(story.drop||1):1)){const r=Math.random();items.push({x,y,k:r<.3?'B':r<.5?'S':r<.68?'C':r<.79?'R':r<.9?'Z':'I',age:0})}}
 function boom(b){const i=bombs.indexOf(b);if(i<0)return;bombs.splice(i,1);sfx('boom');if(hk(b,'I')){sfx('ice');ibur.push({x:b.x*T+T/2,y:b.y*T+T/2,l:.75});blast(b.x,b.y,b.r).forEach(([x,y])=>{ice[y][x]=.9;if(parts.length<700)for(let j=0;j<9;j++){const L=1.1+Math.random()*.8;parts.push({sn:1,x:x*T+Math.random()*T,y:y*T-14-Math.random()*26,vx:0,vy:22+Math.random()*30,l:L,m:L,ph:Math.random()*6,r:1+Math.random()*1.6})}});return}bursts.push({x:b.x*T+T/2,y:b.y*T+T/2,l:.35});
  blast(b.x,b.y,b.r).forEach(([x,y])=>{fire[y][x]=.45;if(parts.length<500)for(let j=0;j<3;j++)parts.push({x:x*T+T/2,y:y*T+T/2,vx:(Math.random()-.5)*70,vy:-Math.random()*80-20,l:.5+Math.random()*.4,m:.9});if(grid[y][x]==2){grid[y][x]=0;dropAt(x,y);for(let j=0;j<6;j++)parts.push({x:x*T+T/2,y:y*T+T/2,vx:(Math.random()-.5)*120,vy:-Math.random()*110-30,l:.6+Math.random()*.4,m:1,c:'#e0913a'})}if(grid[y][x]==3)wallHit(x,y);bombs.filter(o=>o.x==x&&o.y==y).forEach(o=>boom(o))})}
@@ -544,8 +544,8 @@ resize();addEventListener('resize',resize);addEventListener('orientationchange',
 
 
 /* ===== MODO HISTORIA: núcleo (se usa en el juego y en el servidor) ===== */
-const LV={'1-1':{arena:'classic',drop:1,map:["#################", "#P..oooooo.ooo.d#", "#.#.#.#.#o#o#o#.#", "#oooooo.o.o.oo..#", "#.#.#o#o#o#o#.#o#", "#.o..oo.o.ooo.oo#", "#o#.#.#o#o#o#o#.#", "#oooo.o.odoo..o.#", "#o#o#.#.#o#.#o#o#", "#.ooooooooo.oo.o#", "#o#.#.#o#o#.#.#o#", "#..oooo.o.o.oooo#", "#o#o#o#.#o#o#.#K#", "#d.ooooooo....oo#", "#################"]},'1-2':{arena:'classic',drop:.5,map:["#################################", "#P.ooo..ooooooo.ooo...ooooo.oo.o#", "#.#o#o#o#o#o#o#.#o#.#o#.#.#.#.#o#", "#.oo.o..oooo.ooo..od..ooooooo.oo#", "#o#o#o#.#.#o#.#.#.#.#o#.#.#o#.#o#", "#oo.oo..o.ooooooo...oo.o.oo...oo#", "#o#.#o#o#o#.#o#.#.#o#.#.#.#o#o#o#", "#..oooooodooooooooo..T....ooo.o.#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#o#.#.#", "#o.ooo..oo.ooo..ooo.oooooooo...o#", "#o#o#o#o#.#o#o#o#.#.#.#o#.#.#.#.#", "#.o.oo...oooooooo..oo..oo..d.ooo#", "#o#.#o#o#o#o#.#o#o#o#o#o#o#o#o#K#", "#o...oooo.oooooo.oo..oooooo....o#", "#################################"]},'1-3':{arena:'classic',drop:.2,map:["#################################", "#P..o...o.oo.oo.oooooo.o..o.oo.o#", "#.#.#.#o#o#o#o#o#o#o#o#o#o#o#.#K#", "#oooooodoo.oooo.oooo.o.oooo..ooo#", "#o#o#o#o#o#o#o#o#.#.#o#o#.#.#o#o#", "#o.ooo...o....oo.o.ooooo.T.o..o.#", "#.#o#.#o#.#.#.#o#o#.#.#o#.#o#.#.#", "#....oo.oooo.T.ooooooo.ooooooooo#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#.#.#.#", "#o.oo.o.o.oooo.o.o..oo...ood.ooo#", "#o#o#o#o#o#.#o#.#o#.#.#o#o#.#.#.#", "#ooo..ooooooo..d..o....oo.oo..oo#", "#o#o#o#o#.#.#o#.#o#.#o#o#o#.#.#o#", "#.ooo.oooooooo..o.oooo..oo.ooooo#", "#################################"]},'2-1':{arena:'rock',drop:.5,map:["#################", "#P.o.o.oo.o....R#", "#.#.#o#o#o#o#.#o#", "#..o..o.o...oooo#", "#o#.#.#o#o#.#o#.#", "#ooooo.o.o.ooooo#", "#.#.#.#o#o#o#.#o#", "#.oo..oooRoo.oo.#", "#o#.#o#.#o#.#.#.#", "#oooo.oooooo.o.o#", "#.#o#o#.#.#.#o#o#", "#.oooo..oooo...o#", "#o#.#o#.#.#o#o#K#", "#R.oooooooo..o.o#", "#################"]},'2-2':{arena:'rock',drop:.5,map:["#################", "#P.o.oo.o.o.o..R#", "#.#.#o#.#o#o#.#.#", "#..o.o.oo..oooo.#", "#o#o#.#o#o#.#o#.#", "#o...Mooooo.o.oM#", "#.#.#.#.#o#o#.#o#", "#oR..o.oo.ooo.o.#", "#o#.#o#o#.#.#o#.#", "#.oooo...oooo.oo#", "#.#o#o#.#o#.#o#.#", "#....Moooo.o...o#", "#.#.#.#o#.#o#o#K#", "#R.oo.o...oo.o.o#", "#################"]}};
-let dogs=[],trs=[],rks=[],mos=[];
+const LV={'1-1':{arena:'classic',drop:1,map:["#################", "#P..oooooo.ooo.d#", "#.#.#.#.#o#o#o#.#", "#oooooo.o.o.oo..#", "#.#.#o#o#o#o#.#o#", "#.o..oo.o.ooo.oo#", "#o#.#.#o#o#o#o#.#", "#oooo.o.odoo..o.#", "#o#o#.#.#o#.#o#o#", "#.ooooooooo.oo.o#", "#o#.#.#o#o#.#.#o#", "#..oooo.o.o.oooo#", "#o#o#o#.#o#o#.#K#", "#d.ooooooo....oo#", "#################"]},'1-2':{arena:'classic',drop:.5,map:["#################################", "#P.ooo..ooooooo.ooo...ooooo.oo.o#", "#.#o#o#o#o#o#o#.#o#.#o#.#.#.#.#o#", "#.oo.o..oooo.ooo..od..ooooooo.oo#", "#o#o#o#.#.#o#.#.#.#.#o#.#.#o#.#o#", "#oo.oo..o.ooooooo...oo.o.oo...oo#", "#o#.#o#o#o#.#o#.#.#o#.#.#.#o#o#o#", "#..oooooodooooooooo..T....ooo.o.#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#o#.#.#", "#o.ooo..oo.ooo..ooo.oooooooo...o#", "#o#o#o#o#.#o#o#o#.#.#.#o#.#.#.#.#", "#.o.oo...oooooooo..oo..oo..d.ooo#", "#o#.#o#o#o#o#.#o#o#o#o#o#o#o#o#K#", "#o...oooo.oooooo.oo..oooooo....o#", "#################################"]},'1-3':{arena:'classic',drop:.2,map:["#################################", "#P..o...o.oo.oo.oooooo.o..o.oo.o#", "#.#.#.#o#o#o#o#o#o#o#o#o#o#o#.#K#", "#oooooodoo.oooo.oooo.o.oooo..ooo#", "#o#o#o#o#o#o#o#o#.#.#o#o#.#.#o#o#", "#o.ooo...o....oo.o.ooooo.T.o..o.#", "#.#o#.#o#.#.#.#o#o#.#.#o#.#o#.#.#", "#....oo.oooo.T.ooooooo.ooooooooo#", "#o#.#o#o#o#o#.#o#o#o#.#o#o#.#.#.#", "#o.oo.o.o.oooo.o.o..oo...ood.ooo#", "#o#o#o#o#o#.#o#.#o#.#.#o#o#.#.#.#", "#ooo..ooooooo..d..o....oo.oo..oo#", "#o#o#o#o#.#.#o#.#o#.#o#o#o#.#.#o#", "#.ooo.oooooooo..o.oooo..oo.ooooo#", "#################################"]},'2-1':{arena:'rock',drop:.5,map:["#################", "#P.o.o.oo.o....R#", "#.#.#o#o#o#o#.#o#", "#..o..o.o...oooo#", "#o#.#.#o#o#.#o#.#", "#ooooo.o.o.ooooo#", "#.#.#.#o#o#o#.#o#", "#.oo..oooRoo.oo.#", "#o#.#o#.#o#.#.#.#", "#oooo.oooooo.o.o#", "#.#o#o#.#.#.#o#o#", "#.oooo..oooo...o#", "#o#.#o#.#.#o#o#K#", "#R.oooooooo..o.o#", "#################"]},'2-2':{arena:'rock',drop:.5,map:["#################################", "#P...oo.o.o.o....R...oo........o#", "#.#o#.#.#.#o#.#.#o#o#o#o#.#o#o#o#", "#..oo.o.....o.o......o.o.ooooo..#", "#.#o#.#o#o#.#.#o#.#o#o#o#.#.#o#.#", "#.o....o.M.o..oo.oooo.ooo..M...K#", "#o#.#o#o#o#o#.#.#o#o#o#o#o#.#o#.#", "#.o..o.o.o...o.oo..oo.o...o..ooo#", "#.#o#.#.#.#o#o#.#.#o#.#o#o#o#o#o#", "#..o.....o....ooo....M.o......oo#", "#o#o#.#o#o#o#o#o#o#o#o#o#o#.#o#o#", "#..oo..oooooo..o...ooo....o...oo#", "#o#o#o#o#.#o#o#.#.#o#.#o#o#o#.#.#", "#o.R.....o..o....o.o.o..o.o.o..R#", "#################################"]},'2-3':{arena:'rock',drop:.25,map:["#################################", "#P..o...oo.o.oo....oo....R..o..o#", "#.#o#.#o#o#.#o#o#o#.#o#o#o#o#o#o#", "#.oo.R..oo...V....o.o.o........o#", "#.#o#o#o#o#o#.#.#o#o#o#o#o#.#o#o#", "#..o........oo.d...M.o..o.o..o..#", "#o#.#o#o#.#o#.#o#.#o#o#o#o#.#o#.#", "#...o.o....M.oooo.oo....oooVo..o#", "#o#o#o#o#.#o#.#o#.#.#o#.#o#o#o#.#", "#o.o.oo..T..oo.o........ooo..R..#", "#o#.#o#o#.#.#.#o#.#.#.#o#o#.#.#o#", "#o.M.o.oo....oo..o.V...T.....o.o#", "#o#o#o#o#.#.#.#.#o#o#.#o#o#o#o#o#", "#o.o.o....oo.o.R..o.o...o...o..K#", "#################################"]},'3-1':{arena:'ast',drop:1,map:["#################################", "#P...ooo.o..o....oo..o...oo.....#", "#.#.#.#o#.#.#.#o#.#.#o#.#o#o#o#o#", "#........o...oo...o....o.....oo.#", "#o#o#o#.#.#.#.#.#o#o#.#.#o#o#o#.#", "#...o...o.oooo.o.oo.oo..........#", "#o#o#.#.#.#.#.#o#.#o#o#o#o#o#o#.#", "#.o...o..oo.....oo.A..oo....ooo.#", "#o#.#o#o#o#.#o#.#.#o#.#o#.#.#.#o#", "#o.o..........o..o.o.....oo..oo.#", "#o#o#.#o#o#o#.#o#.#.#.#.#.#.#o#o#", "#o.o........o............o...o.o#", "#o#.#o#o#o#o#.#o#o#o#o#.#o#.#o#.#", "#o..oo......o.....o.......o....K#", "#################################"]}};
+let dogs=[],trs=[],rks=[],mos=[],als=[],ndrop={};
 const STP=[[1,1],[2,1],[1,2],[3,1]];
 function blankInv(){return{cap:1,mx:1,spd:75,sp:{R:0,Z:0,I:0}}}
 function say(t){msgT=2;msgTxt=t;msgUp=1}
@@ -624,14 +624,17 @@ function dashDir(r,tx,ty){
  return d}
 function motoDir(r,tx,ty){const free=mos.filter(m=>!m.taken);if(!free.length)return null;
   const gs=new Set(free.map(m=>m.nx+','+m.ny));if(gs.has(tx+','+ty))return null;
-  const first=new Map(),q=[[tx,ty]];first.set(tx+','+ty,null);
-  for(let i=0;i<q.length;i++){const [x,y]=q[i],fk=first.get(x+','+y);
+  const first=new Map(),dep=new Map(),q=[[tx,ty]];first.set(tx+','+ty,null);dep.set(tx+','+ty,0);
+  for(let i=0;i<q.length;i++){const [x,y]=q[i],fk=first.get(x+','+y),dd=dep.get(x+','+y);if(dd>=10+(r.fw||0)/2)continue;
    for(const dr of DIRS){const nx=x+dr[0],ny=y+dr[1],k=nx+','+ny;
     if(nx<0||ny<0||nx>=W||ny>=H||first.has(k))continue;
     const f0=fk||dr;
     if(gs.has(k))return f0;
     if(!dogFree(nx,ny))continue;
-    first.set(k,f0);q.push([nx,ny])}}
+    first.set(k,f0);dep.set(k,dd+1);q.push([nx,ny])}}
+  if(Math.random()<.8){let bd=1e9,bm=null;free.forEach(m=>{const d=Math.abs(m.nx-tx)+Math.abs(m.ny-ty);if(d<bd){bd=d;bm=m}});
+   const op=DIRS.filter(([dx,dy])=>dogFree(tx+dx,ty+dy)&&Math.abs(bm.nx-(tx+dx))+Math.abs(bm.ny-(ty+dy))<bd);
+   if(op.length)return op[Math.floor(Math.random()*op.length)]}
   return null}
  function rkHit(r){r.hp--;r.inv=1.2;bursts.push({x:r.x,y:r.y,l:.35});sfx('boom');if(r.hp<=0){r.dead=true;r.dt=0;r.mnt=false}}
  function rkStep(r,dt){
@@ -647,30 +650,82 @@ function motoDir(r,tx,ty){const free=mos.filter(m=>!m.taken);if(!free.length)ret
   if(r.fz>0){r.fz-=dt;return}
   killNear(r);
   if(r.stun>0){r.stun-=dt;return}
+  if(!r.mnt)r.fw=(r.fw||0)+dt;
   if(!r.mnt){const m=mos.find(m=>!m.taken&&Math.abs(m.x-r.x)<T*.55&&Math.abs(m.y-r.y)<T*.55);if(m){m.taken=true;r.mnt=true;r.hp=2;r.inv=0;sfx('pick');say('🏍️ ¡Un rockero se subió a su moto!')}}
   const dark=(mt+10)%28>=24;
   if(dark&&r.armed){r.armed=false;r.dash=2;r.brk=0}
   if(!dark)r.armed=true;
   if(r.dash>0){r.dash-=dt;r.spd=135}else r.spd=75;
   walkStep(r,dt,tx,ty,r.dash>0?()=>dashDir(r,tx,ty):()=>r.mnt?null:motoDir(r,tx,ty))}
+ function mkAl(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:62,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,mode:0,mt:0,pt:45,ct:4,ctx:0,cty:0,dtx:0,dty:0}}
+ function alReach(px,py,bx,by){const seen=new Set([px+','+py]),q=[[px,py]];
+  for(let i=0;i<q.length&&q.length<12;i++){const [x,y]=q[i];for(const [dx,dy] of DIRS){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=W||ny>=H||seen.has(k)||(nx==bx&&ny==by)||solidT(nx,ny)||bombAt(nx,ny))continue;seen.add(k);q.push([nx,ny])}}
+  return Math.min(q.length,12)}
+ function alOcc(a,x,y){const oc=o=>(Math.floor(o.x/T)==x&&Math.floor(o.y/T)==y)||(o.mvg&&o.nx==x&&o.ny==y);
+  return dogs.some(oc)||trs.some(oc)||rks.some(oc)||als.some(o=>o!==a&&oc(o))||mos.some(m=>!m.taken&&m.nx==x&&m.ny==y)}
+ function alOk(a,x,y){
+  if(x<1||y<1||x>=W-1||y>=H-1||grid[y][x]!=0||bombAt(x,y)||fire[y][x]>0)return false;
+  if(items.some(i=>i.x==x&&i.y==y)||alOcc(a,x,y))return false;
+  for(const e of ents){if(e.hid||!e.alive)continue;const px=Math.floor(e.x/T),py=Math.floor(e.y/T);
+   if(Math.abs(px-x)+Math.abs(py-y)<2||(Math.abs(e.x-(x*T+T/2))<T*1.2&&Math.abs(e.y-(y*T+T/2))<T*1.2))return false;
+   if(alReach(px,py,x,y)<Math.min(alReach(px,py,-1,-1),8))return false}
+  return true}
+ function alCrateTile(a,tx,ty){
+  if(Object.keys(ndrop).filter(k=>{const [x,y]=k.split(',');return grid[+y]&&grid[+y][+x]==2}).length>=36)return null;
+  const c=[];for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){if(!dx&&!dy||Math.abs(dx)+Math.abs(dy)>4)continue;const x=tx+dx,y=ty+dy;
+   if(alOk(a,x,y)){let s=0;for(const [ax,ay] of DIRS)if(solidT(x+ax,y+ay))s++;c.push([[x,y],s+Math.random()*1.6])}}
+  if(!c.length)return null;c.sort((p,q)=>q[1]-p[1]);return c[0][0]}
+ function alFarTile(a){const pl=ents.filter(e=>!e.hid&&e.alive),c=[];
+  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){if(grid[y][x]!=0||bombAt(x,y)||fire[y][x]>0||alOcc(a,x,y))continue;
+   if(pl.some(e=>Math.abs(Math.floor(e.x/T)-x)+Math.abs(Math.floor(e.y/T)-y)<6))continue;c.push([x,y])}
+  return c.length?c[Math.floor(Math.random()*c.length)]:null}
+ function alDir(a,tx,ty){const pl=ents.filter(e=>!e.hid&&e.alive);if(!pl.length)return null;
+  const gs=new Set(pl.map(e=>Math.floor(e.x/T)+','+Math.floor(e.y/T)));if(gs.has(tx+','+ty))return null;
+  const first=new Map(),dep=new Map(),q=[[tx,ty]];first.set(tx+','+ty,null);dep.set(tx+','+ty,0);
+  for(let i=0;i<q.length;i++){const [x,y]=q[i],fk=first.get(x+','+y),dd=dep.get(x+','+y);if(dd>=16)continue;
+   for(const dr of DIRS){const nx=x+dr[0],ny=y+dr[1],k=nx+','+ny;if(nx<0||ny<0||nx>=W||ny>=H||first.has(k))continue;
+    const f0=fk||dr;if(gs.has(k))return f0;if(!dogFree(nx,ny))continue;first.set(k,f0);dep.set(k,dd+1);q.push([nx,ny])}}
+  if(Math.random()<.7){let bd=1e9,bp=null;pl.forEach(e=>{const d=Math.abs(Math.floor(e.x/T)-tx)+Math.abs(Math.floor(e.y/T)-ty);if(d<bd){bd=d;bp=e}});
+   const px=Math.floor(bp.x/T),py=Math.floor(bp.y/T),op=DIRS.filter(([dx,dy])=>dogFree(tx+dx,ty+dy)&&Math.abs(px-(tx+dx))+Math.abs(py-(ty+dy))<bd);
+   if(op.length)return op[Math.floor(Math.random()*op.length)]}
+  return null}
+ function alPlace(a){const x=a.ctx,y=a.cty;if(!alOk(a,x,y))return false;grid[y][x]=2;ndrop[K(x,y)]=1;bursts.push({x:x*T+T/2,y:y*T+T/2,l:.3});sfx('pick');return true}
+ function alStep(a,dt){
+  if(a.dead){a.dt+=dt;return}
+  const tx=Math.floor(a.x/T),ty=Math.floor(a.y/T);
+  if(a.inv>0)a.inv-=dt;
+  if(a.mode!=3&&fire[ty][tx]>0&&a.inv<=0){a.hits++;a.inv=1.3;bursts.push({x:a.x,y:a.y,l:.35});sfx('boom');if(a.hits>=3){a.dead=true;a.dt=0;a.mode=0;return}}
+  if(ice[ty][tx]>0)a.fz=5;
+  if(a.fz>0){a.fz-=dt;return}
+  if(a.mode!=3&&!(a.mode==4&&a.mt>.5))killNear(a);
+  if(a.mode==1){a.mt-=dt;if(a.mt<=0){alPlace(a);a.mode=0;a.ct=3+Math.random()*2}return}
+  if(a.mode==2){a.mt-=dt;if(a.mt<=0){a.mode=3;a.mt=.5}return}
+  if(a.mode==3){a.mt-=dt;if(a.mt<=0){let t=[a.dtx,a.dty];if(!(grid[t[1]][t[0]]==0&&!bombAt(t[0],t[1])&&fire[t[1]][t[0]]<=0))t=alFarTile(a)||[tx,ty];
+   a.x=t[0]*T+T/2;a.y=t[1]*T+T/2;a.nx=t[0];a.ny=t[1];a.mvg=false;a.mode=4;a.mt=.9;bursts.push({x:a.x,y:a.y,l:.4});sfx('warp')}return}
+  if(a.mode==4){a.mt-=dt;if(a.mt<=0){a.mode=0;a.pt=45}return}
+  a.pt-=dt;a.ct-=dt;
+  if(!a.mvg){
+   if(a.pt<=0){const t=alFarTile(a);if(t){a.dtx=t[0];a.dty=t[1];a.mode=2;a.mt=1;sfx('warp');return}a.pt=5}
+   if(a.ct<=0){const t=alCrateTile(a,tx,ty);if(t){a.ctx=t[0];a.cty=t[1];a.mode=1;a.mt=.8;a.face=t[0]>=tx?1:-1;return}a.ct=1.2}}
+  walkStep(a,dt,tx,ty,()=>alDir(a,tx,ty))}
  function buildStory(lv,n,invs){const L=LV[lv];
  story.on=true;story.lv=lv;story.t=0;story.end=0;story.fin=0;story.n=n;story.drop=L.drop||1;
  story.enter=JSON.parse(JSON.stringify(invs));story.inv=JSON.parse(JSON.stringify(invs));
  W=L.map[0].length;camX=0;
  HUMANS=[0,1,2,3].map(i=>i<n);arena=L.arena;init();
- dogs=[];trs=[];rks=[];mos=[];special={};items=[];bombs=[];
- for(let y=0;y<H;y++)for(let x=0;x<W;x++){const ch=L.map[y][x];grid[y][x]=ch=='#'?1:(ch=='o'||ch=='K')?2:0;
-  if(ch=='K')special[K(x,y)]='K';
+ dogs=[];trs=[];rks=[];mos=[];als=[];ndrop={};special={};items=[];bombs=[];
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){const ch=L.map[y][x];grid[y][x]=ch=='#'?1:(ch=='o'||ch=='K'||ch=='V')?2:0;
+  if(ch=='K')special[K(x,y)]='K';if(ch=='V')special[K(x,y)]='P';
   if(ch=='d')dogs.push(mkDog(x,y));
-  if(ch=='T')trs.push(mkTr(x,y));if(ch=='R')rks.push(mkRk(x,y));if(ch=='M')mos.push({x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,taken:false})}
+  if(ch=='T')trs.push(mkTr(x,y));if(ch=='R')rks.push(mkRk(x,y));if(ch=='M')mos.push({x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,taken:false});if(ch=='A')als.push(mkAl(x,y))}
  ents.forEach((e,i)=>{if(i<n){const iv=invs[i]||blankInv();e.cap=iv.cap;e.mx=iv.mx;e.spd=iv.spd;e.sp.R=iv.sp.R;e.sp.Z=iv.sp.Z;e.sp.I=iv.sp.I;e.x=STP[i][0]*T+T/2;e.y=STP[i][1]*T+T/2}else{e.alive=false;e.hid=true}})}
 function storyKey(e){if(story.end)return;story.end=2;story.wt=story.net?5:.9;
  ents.forEach((q,i)=>{if(!q.hid)story.inv[i]={cap:q.cap,mx:q.mx,spd:q.spd,sp:{R:q.sp.R||0,Z:q.sp.Z||0,I:q.sp.I||0}}});
  story.done[story.lv]=true;if(!story.net)stSave();msgT=2;msgTxt='🔑 ¡LLAVE!';msgUp=1}
 function storyTick(dt){
  story.t+=dt;mt=story.t%28;
- if(!story.end){dogs.forEach(d=>dogStep(d,dt));trs.forEach(r=>trStep(r,dt));rks.forEach(r=>rkStep(r,dt))}
- dogs=dogs.filter(d=>!(d.dead&&d.dt>1.4));trs=trs.filter(r=>!(r.dead&&r.dt>1.4));rks=rks.filter(r=>!(r.dead&&r.dt>1.4));
+ if(!story.end){dogs.forEach(d=>dogStep(d,dt));trs.forEach(r=>trStep(r,dt));rks.forEach(r=>rkStep(r,dt));als.forEach(a=>alStep(a,dt))}
+ dogs=dogs.filter(d=>!(d.dead&&d.dt>1.4));trs=trs.filter(r=>!(r.dead&&r.dt>1.4));rks=rks.filter(r=>!(r.dead&&r.dt>1.4));als=als.filter(a=>!(a.dead&&a.dt>1.6));
  if(!story.end&&ents.filter(e=>!e.hid).every(e=>!e.alive)){story.end=1;story.wt=story.net?4:1}
  if(!story.end)return;
  story.wt-=dt;
@@ -707,7 +762,7 @@ globalThis.NET={_lg:'',_n:0,
   if(arena=='bh')r.bh={c:+bhC.toFixed(2),a:bhA?1:0,p:bhPh};
   if(arena=='rock')r.dc=deco;if(arena=='cryo')r.wh=wallHp;
   r.mg={t:msgT>0?+msgT.toFixed(1):0,x:msgTxt,u:msgUp?1:0};
-  if(story.on){r.dg=dogs.map(d=>[Math.round(d.x*10)/10,Math.round(d.y*10)/10,d.face,Math.floor(d.fr)%10,d.fz>0?1:0,d.dead?1:0,+d.dt.toFixed(2),d.mvg?1:0,d.hunt>0?2:(d.call>0?1:0)]);r.tr=trs.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%5,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.act]);r.rk=rks.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%60,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.dash>0?1:0,q.mnt?1:0]);r.mo=mos.filter(m=>!m.taken).map(m=>[m.nx,m.ny]);r.sty={lv:story.lv,e:story.end}}
+  if(story.on){r.dg=dogs.map(d=>[Math.round(d.x*10)/10,Math.round(d.y*10)/10,d.face,Math.floor(d.fr)%10,d.fz>0?1:0,d.dead?1:0,+d.dt.toFixed(2),d.mvg?1:0,d.hunt>0?2:(d.call>0?1:0)]);r.tr=trs.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%5,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.act]);r.rk=rks.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,Math.floor(q.fr)%60,q.fz>0?1:0,q.dead?1:0,+q.dt.toFixed(2),q.dash>0?1:0,q.mnt?1:0]);r.mo=mos.filter(m=>!m.taken).map(m=>[m.nx,m.ny]);r.ax=als.map(q=>[Math.round(q.x*10)/10,Math.round(q.y*10)/10,q.face,q.mode,+q.mt.toFixed(2),q.hits,q.dead?1:0,+q.dt.toFixed(2),q.fz>0?1:0,q.ctx,q.cty,q.dtx,q.dty,q.inv>0?1:0,Math.round(q.fr*10)/10]);r.ab=Object.keys(ndrop).filter(k=>{const [x,y]=k.split(',');return grid[+y]&&grid[+y][+x]==2});r.sty={lv:story.lv,e:story.end}}
   return r}};
 
 // ===== cliente del modo en línea =====
