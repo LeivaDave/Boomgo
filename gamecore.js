@@ -657,7 +657,7 @@ function motoDir(r,tx,ty){const free=mos.filter(m=>!m.taken);if(!free.length)ret
   if(!dark)r.armed=true;
   if(r.dash>0){r.dash-=dt;r.spd=135}else r.spd=75;
   walkStep(r,dt,tx,ty,r.dash>0?()=>dashDir(r,tx,ty):()=>r.mnt?null:motoDir(r,tx,ty))}
- function mkAl(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:75,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,mode:0,mt:0,inIce:false,pt:30+Math.random()*15,ct:8+Math.random()*7,ctx:0,cty:0,dtx:0,dty:0}}
+ function mkAl(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:62,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,mode:0,mt:0,inIce:false,pt:30+Math.random()*15,ct:8+Math.random()*7,ctx:0,cty:0,dtx:0,dty:0}}
  function alReach(px,py,bx,by){const seen=new Set([px+','+py]),q=[[px,py]];
   for(let i=0;i<q.length&&q.length<12;i++){const [x,y]=q[i];for(const [dx,dy] of DIRS){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=W||ny>=H||seen.has(k)||(nx==bx&&ny==by)||solidT(nx,ny)||bombAt(nx,ny))continue;seen.add(k);q.push([nx,ny])}}
   return Math.min(q.length,12)}
@@ -694,6 +694,7 @@ function motoDir(r,tx,ty){const free=mos.filter(m=>!m.taken);if(!free.length)ret
   if(a.dead){a.dt+=dt;return}
   const tx=Math.floor(a.x/T),ty=Math.floor(a.y/T);
   if(a.inv>0)a.inv-=dt;
+  a.spd=a.hits>=2?28:62;
   if(a.mode!=3&&fire[ty][tx]>0&&a.inv<=0){a.hits++;a.inv=1.3;bursts.push({x:a.x,y:a.y,l:.35});sfx('boom');if(a.hits>=3){a.dead=true;a.dt=0;a.mode=0;return}}
   const onI=ice[ty][tx]>0;if(onI){a.fz=5;if(!a.inIce&&a.mode!=3&&a.inv<=0){a.hits++;a.inv=1.3;bursts.push({x:a.x,y:a.y,l:.35});sfx('boom');if(a.hits>=3){a.dead=true;a.dt=0;a.mode=0;a.inIce=true;return}}}a.inIce=onI;
   if(a.fz>0){a.fz-=dt;return}
