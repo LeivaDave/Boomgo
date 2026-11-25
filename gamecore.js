@@ -708,7 +708,7 @@ function motoDir(r,tx,ty){const free=mos.filter(m=>!m.taken);if(!free.length)ret
   if(!a.mvg){
    if(a.pt<=0){const t=alFarTile(a);if(t){a.dtx=t[0];a.dty=t[1];a.mode=2;a.mt=1;sfx('warp');return}a.pt=5}
    if(a.ct<=0){const t=alCrateTile(a,tx,ty);if(t){a.ctx=t[0];a.cty=t[1];a.mode=1;a.mt=.8;a.face=t[0]>=tx?1:-1;return}a.ct=1.2}}
-  walkStep(a,dt,tx,ty,()=>alDir(a,tx,ty))}
+  walkStep(a,dt,tx,ty,()=>story.calm?null:alDir(a,tx,ty))}
  /* ===== MUNDO 4: pulpos ===== */
  const DV=[[0,1],[-1,0],[0,-1],[1,0]];
  function mkPu(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:62,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,inIce:false,mode:0,mt:0,ci:10+Math.random()*15,px:0,py:0,held:false}}
