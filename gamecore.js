@@ -182,7 +182,7 @@ function audBomb(){const al=ents.filter(e=>e.alive);if(!al.length)return;
    ents.forEach(e=>{if(Math.abs(e.x-(x*T+T/2))<T/2+HS&&Math.abs(e.y-(y*T+T/2))<T/2+HS)e.through.add(b)});return}}}
 function update(dt){
  if(state!='play')return;if(story.on&&story.trT>0){story.trT-=dt;return}
- items=items.filter(i=>{i.age+=dt;return i.k=='K'||!(i.age>.6&&fire[i.y][i.x]>0)});
+ items=items.filter(i=>{i.age+=dt;return i.k=='K'||i.k=='L'||!(i.age>.6&&fire[i.y][i.x]>0)});
  bursts.forEach(q=>q.l-=dt);bursts=bursts.filter(q=>q.l>0);ibur.forEach(q=>q.l-=dt);ibur=ibur.filter(q=>q.l>0);
  if(arena=='ast')astEvents(dt);if(arena=='cryo')cryoEvents(dt);if(arena=='bh'&&(!story.on||(story.bhx&&story.boss&&story.boss.ph=='tent')))bhEvents(dt);if(arena=='mc')mcEvents(dt);
  parts.forEach(p=>{p.l-=dt;if(p.sn){p.x+=Math.sin(p.l*4+p.ph)*14*dt;p.y+=p.vy*dt}else{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=90*dt}});parts=parts.filter(p=>p.l>0);
@@ -203,7 +203,7 @@ function update(dt){
   if(e.pz>0){e.pz-=dt;e.pzt-=dt;if(e.pzt<=0){e.pzt=1;const bx=Math.floor(e.x/T),by=Math.floor(e.y/T);if(!bombAt(bx,by)){spawnBomb({x:bx,y:by,r:RG[e.mx],t:3,owner:e,type:e.mx});sfx('pick')}}}
   const ix=items.findIndex(i=>i.x==Math.floor(e.x/T)&&i.y==Math.floor(e.y/T));
   if(ix>=0){const it=items.splice(ix,1)[0];
-   if(it.k=='B')e.cap=Math.min(10,e.cap+1);else if(it.k=='S')e.spd=Math.min(e.bot?117:145,e.spd+(e.bot?11:14));else if(it.k=='C')e.mx=Math.min(4,e.mx+1);else if(it.k=='P'){if(Math.random()<.5){e.pz=5;e.pzt=0;if(!e.bot){msgT=2.4;msgUp=0;msgTxt='☠️ ¡BOMBAS FORZADAS!'}}else{e.cx=5;e.cxT=0;if(!e.bot){msgT=2.4;msgUp=0;msgTxt='💥 ¡MATA A TODOS EN 5s!'}}}else if(it.k=='K'){storyKey(e)}else if(it.k=='T'){const up=Math.random()<.5;mt=up?Math.max(0,mt-10):mt+10;msgT=1.8;msgTxt=up?'⏱ +10s':'⏱ -10s';msgUp=up}else e.sp[it.k]=Math.min(story.on&&(it.k=='I'||(story.lv[0]>='3'&&(it.k=='R'||it.k=='Z')))?10:3,e.sp[it.k]+1);
+   if(it.k=='L'){const li=ents.indexOf(e);if(story.lives&&story.lives[li]!==undefined){story.lives[li]=Math.min(9,story.lives[li]+1);msgT=2.4;msgUp=0;msgTxt='❤️ ¡VIDA EXTRA! Vidas: '+story.lives[li];sfx('pick')}}else if(it.k=='B')e.cap=Math.min(10,e.cap+1);else if(it.k=='S')e.spd=Math.min(e.bot?117:145,e.spd+(e.bot?11:14));else if(it.k=='C')e.mx=Math.min(4,e.mx+1);else if(it.k=='P'){if(Math.random()<.5){e.pz=5;e.pzt=0;if(!e.bot){msgT=2.4;msgUp=0;msgTxt='☠️ ¡BOMBAS FORZADAS!'}}else{e.cx=5;e.cxT=0;if(!e.bot){msgT=2.4;msgUp=0;msgTxt='💥 ¡MATA A TODOS EN 5s!'}}}else if(it.k=='K'){storyKey(e)}else if(it.k=='T'){const up=Math.random()<.5;mt=up?Math.max(0,mt-10):mt+10;msgT=1.8;msgTxt=up?'⏱ +10s':'⏱ -10s';msgUp=up}else e.sp[it.k]=Math.min(story.on&&(it.k=='I'||(story.lv[0]>='3'&&(it.k=='R'||it.k=='Z')))?10:3,e.sp[it.k]+1);
    sfx('pick');if(!e.bot)refreshSel()}
   e.through.forEach(b=>{if(!bombs.includes(b)||Math.abs(e.x-(b.x*T+T/2))>=T/2+HS||Math.abs(e.y-(b.y*T+T/2))>=T/2+HS)e.through.delete(b)});
   if(fire[Math.floor(e.y/T)][Math.floor(e.x/T)]>0&&!(e.cx>0))e.alive=false});
@@ -808,7 +808,7 @@ else{msgT=2;msgUp=0;msgTxt='🐙 ¡TINTA! Resbalas';
   walkStep(k,dt,tx,ty,()=>kuDir(k,tx,ty))}
  /* ===== BOSS DE MUNDO 4 ===== */
  const BPH={face:0,tent:1,wave:2,dying:3,dead:4};
- function mkLv(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:88,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,inIce:false}}
+ function mkLv(x,y){return{x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,dx:1,dy:0,face:1,spd:56,fz:0,fr:0,dead:false,dt:0,mvg:false,hits:0,inv:0,inIce:false}}
  function lvStep(a,dt){
   if(a.dead){a.dt+=dt;return}
   const tx=Math.floor(a.x/T),ty=Math.floor(a.y/T);
@@ -818,7 +818,7 @@ else{msgT=2;msgUp=0;msgTxt='🐙 ¡TINTA! Resbalas';
   a.inIce=onI;
   if(a.fz>0){a.fz-=dt;return}
   killNear(a);
-  walkStep(a,dt,tx,ty,()=>alDir(a,tx,ty))}
+  walkStep(a,dt,tx,ty,()=>null)}
  function aliveFoes(){return[].concat(dogs,trs,rks,als,pus,kus,lvs).filter(o=>!o.dead).length}
  function freeFar(r,n){
   const pl=ents.filter(e=>!e.hid&&e.alive),c=[];
@@ -881,7 +881,10 @@ else{msgT=2;msgUp=0;msgTxt='🐙 ¡TINTA! Resbalas';
   if(ch=='T')trs.push(mkTr(x,y));if(ch=='R')rks.push(mkRk(x,y));if(ch=='M')mos.push({x:x*T+T/2,y:y*T+T/2,nx:x,ny:y,taken:false});if(ch=='A')als.push(mkAl(x,y));if(ch=='U')pus.push(mkPu(x,y));if(ch=='Q')kus.push(mkKu(x,y))}
  ents.forEach(e=>{e.ink=0;e.sd=null;e.gb=null});
  ents.forEach((e,i)=>{if(i<n){const iv=invs[i]||blankInv();e.cap=iv.cap;e.mx=iv.mx;e.spd=iv.spd;e.sp.R=iv.sp.R;e.sp.Z=iv.sp.Z;e.sp.I=iv.sp.I;e.x=STP[i][0]*T+T/2;e.y=STP[i][1]*T+T/2}else{e.alive=false;e.hid=true}});
- if(L.boss)freeFar(5,2).forEach(([x,y])=>items.push({x,y,k:'I',age:0}))}
+ if(L.boss)freeFar(5,2).forEach(([x,y])=>items.push({x,y,k:'I',age:0}));
+ if(!si)story.lifeAt=L0.lives?[0,1,2,3].sort(()=>Math.random()-.5).slice(0,2):[];
+ if(story.lifeAt&&story.lifeAt.includes(story.si)&&story.lives){const bx=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(grid[y][x]==2&&!special[K(x,y)])bx.push([x,y]);
+  if(bx.length&&!L.boss){const q=bx[Math.floor(Math.random()*bx.length)];special[K(q[0],q[1])]='L'}else{const t=freeFar(4,1)[0];if(t)items.push({x:t[0],y:t[1],k:'L',age:0})}}}
 function storyKey(e){if(story.end)return;story.end=2;story.wt=story.net?5:.9;
  ents.forEach((q,i)=>{if(!q.hid)story.inv[i]={cap:q.cap,mx:q.mx,spd:q.spd,sp:{R:q.sp.R||0,Z:q.sp.Z||0,I:q.sp.I||0}}});
  story.done[story.lv]=true;if(!story.net)stSave();msgT=2;msgTxt='🔑 ¡LLAVE!';msgUp=1}
